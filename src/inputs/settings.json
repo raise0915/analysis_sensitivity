@@ -1,0 +1,10 @@
+{
+    "MCX_PATH": "/home/raise/mcx_simulation/mcx",
+    "HOME_PATH": "/homr/raise",
+    "OUTPUT_PATH": "/home/raise/mcx_simulation/analysis_sensitivity/test_res",
+    "INPUT_PATH": "/home/raise/mcx_simulation/analysis_sensitivity/input",
+    "raidus": 1,
+    "length" : 22,
+    "input_name": "test"
+
+}

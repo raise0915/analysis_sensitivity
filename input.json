@@ -1,0 +1,77 @@
+{
+    "Session": {
+      "ID": "/home/raise/mcx_simulation/analysis_sensitivity/ball",
+      "Photons": 1e7,
+      "OutputFormat": "mc2",
+      "OutputType": "F",
+      "RNGSeed": 1648335518       
+    },
+    "Forward": {
+      "T0": 0,
+      "T1": 5e-9,
+      "Dt": 5e-9
+    },
+    "Optode": {
+      "Source": {
+        "Type": "gaussian",
+        "Pos": [
+          250,
+          250,
+          250
+        ],
+        "Dir": [
+          0,
+          0,
+          -1
+        ],
+        "Param1": [
+          5.5,
+          0,
+          0,
+          0
+        ],
+        "Param2": [
+          10,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "Domain": {
+      "LengthUnit": 0.1,
+      "OriginType": true,
+      "Dim": [
+        500,
+        500,
+        500
+      ],
+      "Media": [
+        {
+          "mua": 0,
+          "mus": 0,
+          "g": 1,
+          "n": 1
+        },
+        {
+          "mua": 0.21,
+          "mus": 22,
+          "g": 0.9,
+          "n": 1.4
+        },
+        {
+          "mua": 1e-05,
+          "mus": 0.1,
+          "g": 1,
+          "n": 1
+        },
+        {
+          "mua": 0.21,
+          "mus": 22,
+          "g": 0.9,
+          "n": 1.4
+        }
+      ],
+      "VolumeFile": "/home/raise/mcx_simulation/analysis_sensitivity/089tumour_model.bin"
+    }
+}
