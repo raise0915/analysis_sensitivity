@@ -7,19 +7,18 @@ from scipy.interpolate import interp1d
 from cylinder import create_rotated_cylinder_mask
 from openpyxl import load_workbook
 import icecream as ic
+from numpy.random import default_rng
 
 class SobolAnalysis(Runmcx):
-    def set_variables(self, variables, std_devs, num_samples, max_vals):
+    def set_variables(self, variables, std_dev, num_samples):
         """
         Generates samples for variables with given standard deviations.
         """
         samples = []
+        covariance_matrix = np.diag([std_dev**2, std_dev**2, std_dev**2])  # 共分散行列（対角行列）
         variables = np.concatenate(variables)
-        max_vals = np.concatenate(max_vals)
-        for _ in range(num_samples):
-            # pos_x, pos_y, pos_z, rot_x, rot_y, rot_z
-            sample = [min(np.random.normal(var, std), max_val) for var, std, max_val in zip(variables, std_devs, max_vals)]
-            samples.append(sample)
+        rng = default_rng()
+        samples = rng.multivariate_normal(variables, covariance_matrix, num_samples)
         return samples
 
     def run_simulation(self, vals, label):
@@ -134,26 +133,26 @@ class SobolAnalysis(Runmcx):
         }
 
 
-    def sobol_analysis(self, variables:list, std_devs:list, max_vals, num_samples:int):
+    def sobol_analysis(self, variables:list, std_dev:int, num_samples:int):
         """
         Sobol sensitivity analysis
         """
         import copy
         
-        A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 0:3].values.tolist()
-        # self.set_variables(variables, std_devs, num_samples, max_vals)
+        # A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 0:3].values.tolist()
+        A = self.set_variables(variables, std_dev, num_samples)
         samples =  []
         for i in range(len(A)):
-            samples.append(A[i][0])
+            samples.append(A[i][1])
         plt.hist(samples, bins=100)
         plt.show()
-        B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 0:3].values.tolist()
+        # B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 0:3].values.tolist()
         # self.set_variables(variables, std_devs, num_samples, max_vals)
         
-        # Y_A = self.run_simulation(A, "A")
+        Y_A = self.run_simulation(A, "A")
         # Y_B = self.run_simulation(B, "B")
-        Y_A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 3:].values.tolist()
-        Y_B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 3:].values.tolist()
+        # Y_A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 3:].values.tolist()
+        # Y_B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 3:].values.tolist()
 
         V_Y =  (np.var(Y_A, axis=0))
         ic.ic(V_Y)
@@ -162,6 +161,12 @@ class SobolAnalysis(Runmcx):
         sobol_first = {i: {} for i in range(3)}
         sobol_first_err = {i: {} for i in range(3)}
 
+        for j in range(9):
+            Y_A_column = np.array([row[j] for row in Y_A])
+            sobol_first[i][j] = np.mean(Y_A_column) / V_Y[j]
+            sobol_first_err[i][j] = np.std(np.array(Y_A_column)) / V_Y[j]
+
+        """ 
         for i in range(3):
             if i == 0:
                 Y_A_Bi = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_change_0.xlsx").iloc[:, 3:].values.tolist()
@@ -180,16 +185,23 @@ class SobolAnalysis(Runmcx):
                 sobol_first_err[i][j] = np.std(np.array(Y_A_column) * (np.array(Y_A_Bi_column) - np.array(Y_B_column))) / V_Y[j]
 
             ic.ic(sobol_first)
+        """
                 
         return sobol_first, sobol_first_err    
 
 
 # setting params
-num_samples = 1000  # サンプル数
-w = 0.05 # 30%/2
+num_samples = 5  # サンプル数
 pos_x = 248
 pos_y =  416
 pos_z = 384
+std_dev = 1.67
+## 腫瘍
+# 3sigma = 5 mm 
+# w = 0.05 # 30%/2
+ 
+ 
+
         
 variables = [
     [pos_x, pos_y, pos_z] # position
@@ -206,15 +218,10 @@ max_vals = [
 
 # std_devs = np.concatenate(variables)
 
-## 腫瘍
-# 3sigma = 5 mm 
- 
-std_devs = np.array([1.67, 1.67, 1.67])
-print(std_devs)
 
 # run
 sim = SobolAnalysis()
-sobol_first, sobol_first_err = sim.sobol_analysis(variables, std_devs, max_vals, num_samples)
+sobol_first, sobol_first_err = sim.sobol_analysis(variables, std_dev, num_samples)
 
 # DataFrameに変換
 df_sobol_first = pd.DataFrame(sobol_first)

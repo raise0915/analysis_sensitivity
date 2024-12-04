@@ -13,9 +13,6 @@
 anyio==4.6.0
     # via httpx
     # via jupyter-server
-apptools==5.3.0
-    # via envisage
-    # via mayavi
 argon2-cffi==23.1.0
     # via jupyter-server
 argon2-cffi-bindings==21.2.0
@@ -67,8 +64,6 @@ dicom2nifti==2.5.0
     # via analysis-sensitivity
 dill==0.3.9
     # via multiprocess
-envisage==7.0.3
-    # via mayavi
 et-xmlfile==2.0.0
     # via openpyxl
 executing==2.1.0
@@ -177,12 +172,10 @@ markupsafe==2.1.5
 matplotlib==3.9.2
     # via analysis-sensitivity
     # via salib
-    # via vtk
+    # via seaborn
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
-mayavi==4.8.2
-    # via analysis-sensitivity
 mistune==3.0.2
     # via nbconvert
 mlab==1.1.4
@@ -216,7 +209,6 @@ numpy==1.26.0
     # via dicom2nifti
     # via imageio
     # via matplotlib
-    # via mayavi
     # via nibabel
     # via opencv-python
     # via opencv-python-headless
@@ -226,6 +218,7 @@ numpy==1.26.0
     # via scikit-image
     # via scikit-learn
     # via scipy
+    # via seaborn
     # via tifffile
 opencv-python==4.10.0.84
     # via analysis-sensitivity
@@ -243,7 +236,6 @@ packaging==24.1
     # via jupyterlab-server
     # via lazy-loader
     # via matplotlib
-    # via mayavi
     # via nbconvert
     # via nibabel
     # via plotly
@@ -251,6 +243,7 @@ packaging==24.1
 pandas==2.2.3
     # via analysis-sensitivity
     # via salib
+    # via seaborn
 pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.4
@@ -285,14 +278,11 @@ pydicom==3.0.1
     # via dicom2nifti
     # via rt-utils
 pyface==8.0.0
-    # via envisage
-    # via mayavi
     # via traitsui
 pygments==2.18.0
     # via icecream
     # via ipython
     # via jupyter-console
-    # via mayavi
     # via nbconvert
 pyparsing==3.1.4
     # via matplotlib
@@ -346,14 +336,16 @@ scikit-image==0.24.0
 scikit-learn==1.5.2
     # via analysis-sensitivity
 scipy==1.14.1
+    # via analysis-sensitivity
     # via dicom2nifti
     # via salib
     # via scikit-image
     # via scikit-learn
+seaborn==0.13.2
+    # via analysis-sensitivity
 send2trash==1.8.3
     # via jupyter-server
 setuptools==75.1.0
-    # via envisage
     # via jupyterlab
 simpleitk==2.4.0
     # via analysis-sensitivity
@@ -403,15 +395,10 @@ traitlets==5.14.3
     # via nbconvert
     # via nbformat
 traits==6.4.3
-    # via apptools
-    # via envisage
-    # via mayavi
     # via pyface
     # via traitsui
 traitsui==8.0.0
     # via analysis-sensitivity
-    # via envisage
-    # via mayavi
 types-python-dateutil==2.9.0.20240906
     # via arrow
 typing-extensions==4.12.2
@@ -422,8 +409,6 @@ uri-template==1.3.0
     # via jsonschema
 urllib3==2.2.3
     # via requests
-vtk==9.3.1
-    # via mayavi
 wcwidth==0.2.13
     # via prompt-toolkit
 webcolors==24.8.0
