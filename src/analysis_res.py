@@ -14,16 +14,16 @@ variables = [
     # [0, 0, 1, 1] # optical_properties for normal
 ]
 
-Y_A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 3:].values.tolist()
+Y_A = pd.read_excel("input_A.xlsx").iloc[:, 3:].values.tolist()
 V_Y =  (np.var(Y_A, axis=0, ddof=1))
-Y_B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 3:].values.tolist()
+Y_B = pd.read_excel("input_B.xlsx").iloc[:, 3:].values.tolist()
         
 
 sobol_first = {i: {} for i in range(3)}
 sobol_first_err = {i: {} for i in range(3)}
 
 for i in range(2):
-    Y_A_Bi = pd.read_excel(f"/home/raise/mcx_simulation/analysis_sensitivity/input_change_{i}.xlsx").iloc[:, 3:].values.tolist()
+    Y_A_Bi = pd.read_excel(f"input_change_{i}.xlsx").iloc[:, 3:].values.tolist()
     for j in range(9):
         Y_A_Bi_column = np.array([row[j] for row in Y_A_Bi])
         Y_A_column = np.array([row[j] for row in Y_A])

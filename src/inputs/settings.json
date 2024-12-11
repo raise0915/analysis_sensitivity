@@ -1,8 +1,8 @@
 {
-    "MCX_PATH": "/home/raise/mcx_simulation/mcx",
-    "HOME_PATH": "/homr/raise",
-    "OUTPUT_PATH": "/home/raise/mcx_simulation/analysis_sensitivity/test_res",
-    "INPUT_PATH": "/home/raise/mcx_simulation/analysis_sensitivity/input",
+    "MCX_PATH": "/home/mbpl/morizane/mcx",
+    "HOME_PATH": "/home/mbpl",
+    "OUTPUT_PATH": "/home/mbpl/morizane/analysis_sensitivity/test_res",
+    "INPUT_PATH": "/home/mbpl/morizane/analysis_sensitivity/input",
     "raidus": 1,
     "length" : 22,
     "input_name": "test"

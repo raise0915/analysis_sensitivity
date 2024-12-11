@@ -5,10 +5,14 @@ build/
 dist/
 wheels/
 *.egg-info
-dataset/*
 *.mc2
 *.bin
 *.deb
 
 # venv
 .venv
+
+# others
+archives/
+.vscode/
+dataset/*

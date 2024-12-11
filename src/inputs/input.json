@@ -1,7 +1,7 @@
 {
     "Session": {
-      "ID": "/home/raise/mcx_simulation/analysis_sensitivity/test_res",
-      "Photons": 1e7,
+      "ID": "/home/mbpl/morizane/analysis_sensitivity/test_res",
+      "Photons": 1e2,
       "OutputFormat": "mc2",
       "OutputType": "F",
       "RNGSeed": 1648335518       
@@ -13,7 +13,7 @@
     },
     "Optode": {
       "Source": {
-        "Type": "gaussian",
+        "Type": "pencil",
         "Pos": [247, 414, 382],
         "Dir": [
           0,
@@ -30,6 +30,7 @@
       }
     },
     "Domain": {
+      "VolumeFile": "/home/mbpl/morizane/analysis_sensitivity/089_tumour_model.bin",
       "LengthUnit": 0.5,
       "OriginType": true,
       "Dim": [
@@ -62,7 +63,6 @@
             "g": 0.9,
             "n": 1.4
           }
-      ],
-      "VolumeFile": "/home/raise/mcx_simulation/analysis_sensitivity/089_tumour_model.bin"
+      ]
     }
 }

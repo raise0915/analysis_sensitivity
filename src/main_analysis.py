@@ -236,7 +236,7 @@ class SobolAnalysis(Runmcx):
 
 if __name__ == "__main__":
     # setting params
-    num_samples = 2  # サンプル数
+    num_samples = 1000  # サンプル数
     pos_x = 248
     pos_y = 416
     pos_z = 384
@@ -261,8 +261,6 @@ if __name__ == "__main__":
             # [10**5, 10**5, 10**5, 10**5]
         ]
 
-        # std_devs = np.concatenate(variables)
-
         # run
         sim = SobolAnalysis()
         sobol_first, sobol_first_err = sim.sobol_analysis(
@@ -274,10 +272,11 @@ if __name__ == "__main__":
         df_sobol_first_err = pd.DataFrame(sobol_first_err)
 
         # エクセルに保存
-        with pd.ExcelWriter("sobol_analysis_results.xlsx") as writer:
+        with pd.ExcelWriter(f"/home/mbpl/morizane/analysis_sensitivity/sobol_analysis_results_{sigma}.xlsx") as writer:
             df_sobol_first.to_excel(writer, sheet_name="Sobol First")
             df_sobol_first_err.to_excel(writer, sheet_name="Sobol First Error")
 
+"""
     # プロット
     vals_flatten = np.array(variables).flatten()
     labels = [f"x{i+1}" for i in range(len(vals_flatten))]
@@ -287,3 +286,5 @@ if __name__ == "__main__":
     plt.ylabel("ST")
     plt.title("Sobol Sensitivity Analysis")
     plt.show()
+"""
+
