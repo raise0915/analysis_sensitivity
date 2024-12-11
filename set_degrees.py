@@ -2,7 +2,63 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.random import default_rng
 import icecream as ic 
+rand_uniform01 = np.random.rand
 
+
+def calculate_position_and_direction(center, radius, length, direction):
+    TWO_PI = 2 * np.pi
+    ONE_PI = np.pi
+
+    phi = TWO_PI * rand_uniform01()
+    sphi, cphi = np.sin(phi), np.cos(phi)
+    r = radius
+
+    ytheta = 2.0 * ONE_PI * direction[0] / 360.0
+    ptheta = 2.0 * ONE_PI * direction[1] / 360.0
+    rtheta = 2.0 * ONE_PI * direction[2] / 360.0
+
+    Cy, Sy = np.cos(ytheta), np.sin(ytheta)
+    Cp, Sp = np.cos(ptheta), np.sin(ptheta)
+    Cr, Sr = np.cos(rtheta), np.sin(rtheta)
+
+    x1 = center[0] + r * cphi
+    y1 = center[1] + r * sphi
+    z1 = center[2] + length / 2.0 - rand_uniform01() * length
+
+    x2, y2, z2 = x1 - center[0], y1 - center[1], z1 - center[2]
+
+    x3 = Cy * Cp * x2 + (Cy * Sp * Sr - Sy * Cr) * y2 + (Cy * Sp * Cr + Sy * Sr) * z2
+    y3 = Sy * Cp * x2 + (Sy * Sp * Sr + Cy * Cr) * y2 + (Sy * Sp * Cr - Cy * Sr) * z2
+    z3 = -Sp * x2 + Cp * Sr * y2 + Cp * Cr * z2
+
+    return x3, y3, z3
+
+def calculate_direction_from_position(x, y, z):
+    ONE_PI = np.pi
+
+    r = np.sqrt(x**2 + y**2 + z**2)
+    ytheta = np.arctan2(y, x)
+    ptheta = np.arccos(z / r)
+    rtheta = 0  # Assuming no roll component for simplicity
+
+    direction = [
+        ytheta * 360.0 / (2.0 * ONE_PI),
+        ptheta * 360.0 / (2.0 * ONE_PI),
+        rtheta * 360.0 / (2.0 * ONE_PI)
+    ]
+
+    return direction
+
+# Example usage
+x3, y3, z3 = calculate_position_and_direction([0, 0, 0], 1, 1, [45, 45, 0])
+direction = calculate_direction_from_position(x3, y3, z3)
+ic.ic(direction)
+    
+"""
+確認すること
+mcxの角度変換がどうなっているか
+そこからphiへの変換-> 正規分布 -> 再度直交座標に変換
+"""
 samples = 1000
 
 # Convert Cartesian coordinates (x, y, z) to spherical coordinates (phi, mtheta)
