@@ -7,13 +7,13 @@ import icecream as ic
 class Runmcx():
     def __init__(self, save=0) -> None:
         self.save = 1
-        json_open = open("src/inputs/settings.json", "r")
+        json_open = open("/home/mbpl/morizane/analysis_sensitivity/src/inputs/settings.json", "r")
         settings = json.load(json_open)
         self.MCX_PATH = settings.get('MCX_PATH')
         self.radius = settings.get('raidus')
         self.length = settings.get('length')
         self.input_name = settings.get('INPUT_PATH')
-        self.cfg = json.load(open("src/inputs/input.json"))
+        self.cfg = json.load(open("/home/mbpl/morizane/analysis_sensitivity/src/inputs/input.json"))
         self.HOME_PATH = settings.get('HOME_PATH')
         self.OUTPUT_PATH = settings.get('OUTPUT_PATH')
         self.model_path = self.cfg['Domain']['VolumeFile']
