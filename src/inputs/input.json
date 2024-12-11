@@ -1,7 +1,7 @@
 {
     "Session": {
       "ID": "/home/mbpl/morizane/analysis_sensitivity/test_res",
-      "Photons": 1e2,
+      "Photons": 1e8,
       "OutputFormat": "mc2",
       "OutputType": "F",
       "RNGSeed": 1648335518       
