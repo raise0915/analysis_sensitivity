@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from run_mcx import Runmcx
 import pandas as pd
 from calc_dvh import calc_log_dvh_with_log

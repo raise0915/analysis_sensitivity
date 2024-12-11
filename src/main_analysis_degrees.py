@@ -7,6 +7,7 @@ from scipy.interpolate import interp1d
 from cylinder import create_rotated_cylinder_mask
 import icecream as ic
 from numpy.random import default_rng
+import copy
 
 class SobolAnalysis(Runmcx):
     def set_variables(self, variables, std_dev, num_samples):

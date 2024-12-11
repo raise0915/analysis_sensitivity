@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.random import default_rng
-import math
 import icecream as ic 
 
 samples = 1000
