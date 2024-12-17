@@ -6,23 +6,21 @@ authors = [
     { name = "raise0915", email = "63898148+raise0915@users.noreply.github.com" }
 ]
 dependencies = [
-    "matplotlib>=3.7.4",
-    "opencv-python>=4.9.0.80",
-    "opencv-python-headless>=4.9.0.80",
-    "pydicom>=3.0.1",
-    "scikit-learn>=1.3.2",
-    "plotly>=5.20.0",
-    "ruff>=0.3.0",
-    "pandas>=2.2.1",
-    "jinja2>=3.1.4",
+    "matplotlib>=3.10.0",
+    "pydicom",
+    "scikit-learn",
+    "plotly",
+    "ruff",
+    "pandas",
+    "jinja2",
     "mlab>=1.1.4",
     "traitsui>=8.0.0",
     "numpy==1.26.0",
     "configobj>=5.0.9",
     "jupyter>=1.1.1",
-    "nibabel>=5.2.1",
-    "dicom2nifti>=2.5.0",
-    "scikit-image>=0.24.0",
+    "nibabel>=5.3.2",
+    "dicom2nifti",
+    "scikit-image",
     "simpleitk>=2.4.0",
     "rt-utils>=1.2.7",
     "pexpect>=4.9.0",
@@ -32,6 +30,8 @@ dependencies = [
     "pyqt5>=5.15.11",
     "scipy>=1.14.1",
     "seaborn>=0.13.2",
+    "vtk==9.3.0",
+    "pip>=24.3.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
