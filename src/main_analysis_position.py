@@ -6,6 +6,8 @@ from scipy.interpolate import interp1d
 from cylinder import create_rotated_cylinder_mask
 import icecream as ic
 from numpy.random import default_rng
+from matplotlib import pyplot as plt
+from datetime import datetime
 
 
 class SobolAnalysis(Runmcx):
@@ -34,7 +36,7 @@ class SobolAnalysis(Runmcx):
             # opt_tumour = [val[6], val[7], val[8], val[9]]
             # opt_normal = [val[10], val[11], val[12], val[13]]
 
-            self.run_mcx(cylinder_pos)  # , cylinder_rot, opt_tumour, opt_normal)
+            self.run_mcx(cylinder_pos, cylinder_rot)  # , cylinder_rot, opt_tumour, opt_normal)
             self.create_model(cylinder_pos, cylinder_rot)
             res_dict = self.evaluate_model()
             df = pd.DataFrame(
@@ -66,11 +68,12 @@ class SobolAnalysis(Runmcx):
                     res_dict["cover_rate_1"],
                 ]
             )
+            today = datetime.today().strftime('%Y%m%d')
             if i == 0:
-                df.to_excel(f"{self.input_name}_{label}.xlsx", index=False, header=True)
+                df.to_excel(f"{self.input_name}_{today}_{label}.xlsx", index=False, header=True)
             else:
                 with pd.ExcelWriter(
-                    f"{self.input_name}_{label}.xlsx",
+                    f"{self.input_name}_{today}_{label}.xlsx",
                     mode="a",
                     engine="openpyxl",
                     if_sheet_exists="overlay",
@@ -177,13 +180,13 @@ class SobolAnalysis(Runmcx):
 
         # A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 0:3].values.tolist()
         A = self.set_variables(variables, std_dev, num_samples)
-        """
+
         samples = []
         for i in range(len(A)):
             samples.append(A[i][1])
-        plt.hist(samples, bins=100)
+        plt.hist(samples, bins=10)
         plt.show()
-        """
+
 
         # B = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_B.xlsx").iloc[:, 0:3].values.tolist()
         # B = self.set_variables(variables, std_dev, num_samples)
@@ -208,34 +211,12 @@ class SobolAnalysis(Runmcx):
             Y_A_column = np.array([row[j] for row in Y_A])
             sobol_first[j] = np.mean(Y_A_column) / V_Y[j]
             sobol_first_err[j] = np.std(np.array(Y_A_column)) / V_Y[j]
-
-        """ 
-        for i in range(3):
-            if i == 0:
-                Y_A_Bi = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_change_0.xlsx").iloc[:, 3:].values.tolist()
-            else:
-                A_Bi = copy.deepcopy(A)
-                for j in range(num_samples):
-                    A_Bi[j][i] = B[j][i]
-                Y_A_Bi = self.run_simulation(A_Bi, f'change_{i}')
-            ic.ic(len(Y_A))
-            ic.ic(len(Y_A_Bi))
-            for j in range(9):
-                Y_A_Bi_column = np.array([row[j] for row in Y_A_Bi])
-                Y_A_column = np.array([row[j] for row in Y_A])
-                Y_B_column = np.array([row[j] for row in Y_B])
-                sobol_first[i][j] = np.mean(Y_A_column * (Y_A_Bi_column - Y_B_column)) / V_Y[j]
-                sobol_first_err[i][j] = np.std(np.array(Y_A_column) * (np.array(Y_A_Bi_column) - np.array(Y_B_column))) / V_Y[j]
-
-            ic.ic(sobol_first)
-        """
-
         return sobol_first, sobol_first_err
 
 
 if __name__ == "__main__":
     # setting params
-    num_samples = 1000  # サンプル数
+    num_samples = 10  # サンプル数
     pos_x = 248
     pos_y = 416
     pos_z = 384
@@ -243,7 +224,7 @@ if __name__ == "__main__":
     ## 腫瘍
     # 3sigma = 5 mm
     # w = 0.05 # 30%/2
-    for sigma in [5, 10, 15]:
+    for sigma in [5, 10]:
         std_dev = round(sigma / 3, 2)
         ic.ic(std_dev)
 

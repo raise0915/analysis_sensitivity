@@ -206,14 +206,16 @@ notebook==7.3.1
 notebook-shim==0.2.4
     # via jupyterlab
     # via notebook
-numpy==1.26.0
+numpy==2.2.0
     # via analysis-sensitivity
     # via contourpy
     # via dicom2nifti
     # via imageio
     # via matplotlib
     # via nibabel
+    # via opencv-contrib-python
     # via opencv-python
+    # via opencv-python-headless
     # via pandas
     # via rt-utils
     # via salib
@@ -222,8 +224,12 @@ numpy==1.26.0
     # via scipy
     # via seaborn
     # via tifffile
+opencv-contrib-python==4.10.0.84
+    # via analysis-sensitivity
 opencv-python==4.10.0.84
     # via rt-utils
+opencv-python-headless==4.10.0.84
+    # via analysis-sensitivity
 openpyxl==3.1.5
     # via analysis-sensitivity
 overrides==7.7.0
@@ -346,7 +352,8 @@ seaborn==0.13.2
     # via analysis-sensitivity
 send2trash==1.8.3
     # via jupyter-server
-setuptools==75.1.0
+setuptools==75.6.0
+    # via analysis-sensitivity
     # via jupyterlab
 simpleitk==2.4.0
     # via analysis-sensitivity

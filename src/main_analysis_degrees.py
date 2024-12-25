@@ -17,6 +17,7 @@ class SobolAnalysis(Runmcx):
         std_dev_pos = std_dev["position"]
         std_dev_rot = std_dev["rotation"]
 
+
         # position
         covariance_matrix = np.diag([std_dev_pos**2, std_dev_pos**2, std_dev_pos**2])  # 共分散行列（対角行列）
         pos_vals = np.concatenate([variables[0]])
@@ -44,7 +45,7 @@ class SobolAnalysis(Runmcx):
 
         return samples
 
-    def run_simulation(self, vals, label):
+    def run_simulation(self, vals, label, num_samples):
         """
         Runs simulations for given values.
         """
@@ -175,44 +176,42 @@ class SobolAnalysis(Runmcx):
         plt.hist(samples, bins=100)
         plt.show()
         
-        Y_A = self.run_simulation(A, f"A_{std_devs}")
-        Y_B = self.run_simulation(B, f"B_{std_devs}")
+        Y_A = self.run_simulation(A, f"A_{std_devs}", num_samples)
+        Y_B = self.run_simulation(B, f"B_{std_devs}", num_samples)
 
-        V_Y = np.array([])
+        V_Y = np.zeros(9)
         for i in range(9):
-            V_Y[i] =  (np.var(Y_A[:][i], axis=0))
+            V_Y[i] =  np.var([row[i] for row in Y_A], axis=0)
 
-        
         ic.ic(V_Y)
-        # V_Y = np.var(Y_A, ddof=1)
 
-        sobol_first = {i: {} for i in range(3)}
-        sobol_first_err = {i: {} for i in range(3)}
+        sobol_first = {i: {} for i in range(9)}
+        sobol_first_err = {i: {} for i in range(9)}
 
         for j in range(9):
             Y_A_column = np.array([row[j] for row in Y_A])
-            sobol_first[i][j] = np.mean(Y_A_column) / V_Y[j]
-            sobol_first_err[i][j] = np.std(np.array(Y_A_column)) / V_Y[j]
+            sobol_first[j] = np.mean(Y_A_column) / V_Y[j]
+            sobol_first_err[j] = np.std(Y_A_column) / V_Y[j]
 
         for index in ['position', 'rotation']:
             A_Bi = copy.deepcopy(A)
             for j in range(num_samples):
                 A_Bi[index][j] = B[index][j]
-            Y_A_Bi = self.run_simulation(A_Bi, f'change{index}_{std_devs}')
+            Y_A_Bi = self.run_simulation(A_Bi, f'change{index}_{std_devs}', num_samples)
 
             for j in range(9):
                 Y_A_Bi_column = np.array([row[j] for row in Y_A_Bi])
                 Y_A_column = np.array([row[j] for row in Y_A])
                 Y_B_column = np.array([row[j] for row in Y_B])
-                sobol_first[i][j] = np.mean(Y_A_column * (Y_A_Bi_column - Y_B_column)) / V_Y[j]
-                sobol_first_err[i][j] = np.std(np.array(Y_A_column) * (np.array(Y_A_Bi_column) - np.array(Y_B_column))) / V_Y[j]
+                sobol_first[j] = np.mean(Y_A_column * (Y_A_Bi_column - Y_B_column)) / V_Y[j]
+                sobol_first_err[j] = np.std(Y_A_column * (Y_A_Bi_column - Y_B_column)) / V_Y[j]
 
             ic.ic(sobol_first)                
         return sobol_first, sobol_first_err    
 
 if __name__ == '__main__':
     # setting params
-    num_samples = 2  # サンプル数
+    num_samples = 5  # サンプル数
     pos_x = 248
     pos_y =  416
     pos_z = 384
@@ -224,8 +223,8 @@ if __name__ == '__main__':
     ## 腫瘍
     # 3sigma = 5 mm 
     # w = 0.05 # 30%/2
-    for sigma_pos in [5, 10, 15]:
-        for sigma_rot in [5, 10, 15]:
+    for sigma_pos in [5, 10]:
+        for sigma_rot in [5, 10]:
             std_dev_pos = round(sigma_pos / 3, 2)
             std_dev_rot = round(sigma_rot / 3, 2) # degree
             std_devs = {"position": std_dev_pos, "rotation": std_dev_rot}  

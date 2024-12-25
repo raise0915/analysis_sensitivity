@@ -9,13 +9,11 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 
 
-from mayavi import mlab
-
-paticipent_id = '086'
+paticipent_id = '089'
 original_data = '1.000000-NA-00092'
 
 # Load the RTSTRUCT file and the corresponding image DICOM file(s)
-dataset_path = f'/mnt/e/dataset/LUNG1-{paticipent_id}'
+dataset_path = f'/home/mbpl/morizane/analysis_sensitivity/dataset/LUNG1-{paticipent_id}'
 dicom_series_path = os.path.join(dataset_path, 'original_data')
 rt_struct_path = os.path.join(dataset_path, 'rt_struct/1-1.dcm')
 
@@ -51,9 +49,15 @@ aa = nii_img.get_fdata().astype(np.uint8)
 aa = np.flip(aa, axis=2)
 aa = np.rot90(aa, k=1, axes=(0, 1))
 
+from matplotlib import pyplot as plt
+import matplotlib
 
-mlab.figure()
-mlab.contour3d(aa, contours=6, opacity=0.1)
-mlab.contour3d(tumour_mask, contours=50, opacity=0.1)
+plt.imshow(aa[:, 200, :])
+plt.show()
 
-mlab.show()
+# Correct usage of cv2.fillPoly
+# Example usage:
+# mask = np.zeros((height, width), dtype=np.uint8)
+# points = np.array([[x1, y1], [x2, y2], [x3, y3]])
+# cv2.fillPoly(mask, [points], 1)
+
