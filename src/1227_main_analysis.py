@@ -100,59 +100,6 @@ class SobolAnalysis_1227(SobolAnalysis):
                             header=False,
                             startrow=i + 1,
                         )
-    def sobol_analysis(self, variables, std_dev, num_samples: int):
-        """
-        Sobol sensitivity analysis
-        """
-
-        # A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 0:3].values.tolist()
-        std_dev_pos = int(std_dev['pos'] * 3)
-        std_dev_rot = int(std_dev['rot'] * 3)
-        A = {}
-        B = {}
-        try:
-            a_list = pd.read_excel(f"/home/mbpl/morizane/analysis_sensitivity/input_A_pos_{std_dev_pos}_rot_{std_dev_rot}.xlsx")
-            A['pos'] = a_list[['pos_x', 'pos_y', 'pos_z']].values
-            A['rot'] = a_list[['rot_x', 'rot_y', 'rot_z']].values
-            A['opt'] = a_list[['mua_normal', 'mus_normal', 'mua_tumour', 'mus_tumour']].values
-
-            b_list = pd.read_excel(f"/home/mbpl/morizane/analysis_sensitivity/input_B_pos_{std_dev_pos}_rot_{std_dev_rot}.xlsx")
-            B['pos'] = b_list[['pos_x', 'pos_y', 'pos_z']].values
-            B['rot'] = b_list[['rot_x', 'rot_y', 'rot_z']].values
-            B['opt'] = b_list[['mua_normal', 'mus_normal', 'mua_tumour', 'mus_tumour']].values
-        except Exception as e:
-            raise e
-            # send_email('Error', f'Error occurred in B simulation\n{e}')
-
-        """
-        samples = []
-        for i in range(len(A)):
-            samples.append(A[i][1])
-        plt.hist(samples, bins=100)
-        plt.show()
-        
-        """
-
-        for changes in ['rot', 'opt']:
-            std_dev_pos = std_dev['pos'] * 3
-            std_dev_rot = std_dev['rot'] * 3
-            try:
-                print(B)
-                AB = self.create_Ci(A, B, changes)
-                self.run_simulation(AB, f"AB_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
-                send_email('AB simulation', f"AB simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")
-
-                BA = self.create_Ci(B, A, changes)
-                self.run_simulation(BA, f"BA_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
-                send_email('BA simulation', f"BA simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")
-            except Exception as e: 
-                raise e
-                send_email('Error', f'Error occurred in AB simulation\n{e}')
-            
-
-
-
-
 
 if __name__ == "__main__":
     # setting params
