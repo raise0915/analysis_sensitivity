@@ -5,7 +5,7 @@ import subprocess
 import icecream as ic
 
 class Runmcx():
-    def __init__(self, move_type) -> None:
+    def __init__(self) -> None:
         self.save = 1
         json_open = open("/home/mbpl/morizane/analysis_sensitivity/src/inputs/settings.json", "r")
         settings = json.load(json_open)
@@ -17,13 +17,12 @@ class Runmcx():
         self.HOME_PATH = settings.get('HOME_PATH')
         self.OUTPUT_PATH = settings.get('OUTPUT_PATH')
         self.model_path = self.cfg['Domain']['VolumeFile']
-        self.type = move_type
    
     def set_conditions(self, params): # , rotation, opt_tumour, opt_normal):
         output_path = os.path.join(self.MCX_PATH, "test.json")
         self.cfg['Session']['ID'] =  self.OUTPUT_PATH
         self.cfg['Optode']['Source']['Type'] = 'gaussian'
-        self.cfg['Optode']['Source']['Pos'] = params['position']
+        self.cfg['Optode']['Source']['Pos'] = [params['position'][0], params['position'][1], params['position'][2]]
         self.cfg['Optode']['Source']['Param1'] = [self.radius, params['rotation'][0], params['rotation'][1], params['rotation'][2]] # gaussianの回転方向はここで指定する
         self.cfg['Optode']['Source']['Param2'] = [self.length, 0, 0, 0]
         self.cfg['Optode']['Source']['Lambda'] = 664
@@ -63,6 +62,6 @@ class Runmcx():
 
     def run_mcx(self, params): # , rotation, opt_tumour, opt_normal):
         self.set_conditions(params) # , rotation, opt_tumour, opt_normal)
-        os.chdir(self.MCX_PATH) 
-        subprocess.run("./bin/mcx -f test.json", shell=True)
+        os.chdir(self.MCX_PATH)     
+        subprocess.run( "./bin/mcx -f test.json", shell=True)
 

@@ -16,3 +16,10 @@ wheels/
 archives/
 .vscode/
 dataset/*
+*.xlsx
+*.jpg
+*.png
+*.jpeg
+*.jnii
+*.jdat
+*.csv   

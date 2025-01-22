@@ -6,9 +6,10 @@ from scipy.interpolate import interp1d
 from cylinder import create_rotated_cylinder_mask
 import icecream as ic
 from numpy.random import default_rng
+from send_mail import send_email
 
 global today
-today ='1225'
+today ='0108'
 
 
 class SobolAnalysis(Runmcx):        
@@ -63,6 +64,7 @@ class SobolAnalysis(Runmcx):
                 self.create_model(cylinder_pos, cylinder_rot)
                 res_dict = self.evaluate_model()
             except Exception as e:
+                send_email('Error', e)
                 continue
             df = pd.DataFrame(
                 {
@@ -102,10 +104,10 @@ class SobolAnalysis(Runmcx):
             )
             
             if i == 0:
-                df.to_excel(f"{self.input_name}_{self.type}_{today}_{label}.xlsx", index=False, header=True)
+                df.to_excel(f"{self.input_name}_{today}_{label}.xlsx", index=False, header=True)
             else:
                 with pd.ExcelWriter(
-                    f"{self.input_name}_{self.type}_{today}_{label}.xlsx",
+                    f"{self.input_name}_{today}_{label}.xlsx",
                     mode="a",
                     engine="openpyxl",
                     if_sheet_exists="overlay",
@@ -144,74 +146,80 @@ class SobolAnalysis(Runmcx):
             res, self.model
         )
 
+        res_dict = {}
         # tumour tissue
-        Dx = interp1d(cum_rel_dvh_t, bin_edges[:-1])
-        try:
-            d90_t = float(Dx([90])[0])
-        except Exception:
-            d90_t = np.nan
-        try:
-            d50_t = float(Dx([50])[0])
-        except Exception:
-            d50_t = np.nan
-        try:
-            d10_t = float(Dx([10])[0])
-        except Exception:
-            d10_t = np.nan
+        
+        def calc_dvh(Dx, i):
+            try:
+                return float(Dx([i])[0])
+            except Exception:
+                return np.nan
+        
+        def calc_cover_rate_tumour(i):
+            return (
+                np.count_nonzero((self.model == 3) & (res >= i))
+                / np.count_nonzero(self.model == 3)
+                * 100
+            )
+        
+        def calc_cover_rate_normal(i):
+            return (
+                np.count_nonzero((self.model == 1) & (res >= i))
+                / np.count_nonzero(self.model == 1)
+                * 100
+            )
 
+        def calc_irrad_volume_normal(i):
+            return np.count_nonzero((self.model == 1) & (res >= i))
+
+        def calc_irrad_volume_tumour(i):
+            return np.count_nonzero((self.model == 3) & (res >= i))
+                       
         # normal tissue
-        Dx = interp1d(cum_rel_dvh_l, bin_edges[:-1])
-        try:
-            d90_n = float(Dx([90])[0])
-        except Exception:
-            d90_n = np.nan
-        try:
-            d50_n = float(Dx([50])[0])
-        except Exception:
-            d50_n = np.nan
-        try:
-            d10_n = float(Dx([10])[0])
-        except Exception:
-            d10_n = np.nan
+        Dx_tumour = interp1d(cum_rel_dvh_t, bin_edges[:-1])
+        Dx_normal = interp1d(cum_rel_dvh_l, bin_edges[:-1])
+        for i in [90, 50, 10]:
+            res_dict[f'dvh_tumour_d{i}'] = calc_dvh(Dx_tumour, i)
+            res_dict[f'dvh_normal_d{i}'] = calc_dvh(Dx_normal, i)
 
-        # cover_rate
-        cover_rate_100 = (
-            np.count_nonzero((self.model == 3) & (res >= 100))
-            / np.count_nonzero(self.model == 3)
-            * 100
-        )
-        cover_rate_10 = (
-            np.count_nonzero((self.model == 3) & (res >= 10))
-            / np.count_nonzero(self.model == 3)
-            * 100
-        )
-        cover_rate_1 = (
-            np.count_nonzero((self.model == 3) & (res >= 1))
-            / np.count_nonzero(self.model == 3)
-            * 100
-        )
+        for i in  [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 1, 0.1]:
+            res_dict[f'cover_rate_normal_{i}'] = calc_cover_rate_normal(i)
+            res_dict[f'cover_rate_tumour_{i}'] = calc_cover_rate_tumour(i)
+            res_dict[f'irrad_volume_normal_{i}'] = calc_irrad_volume_normal(i)
+            res_dict[f'irrad_volume_tumour_{i}'] = calc_irrad_volume_tumour(i)
+        
+        return res_dict
+            
 
-        return {
-            "dvh": {
-                "tumour": {
-                    "d90": d90_t,
-                    "d50": d50_t,
-                    "d10": d10_t,
-                },
-                "normal": {"d90": d90_n, "d50": d50_n, "d10": d10_n},
-            },
-            "cover_rate_100": cover_rate_100,
-            "cover_rate_10": cover_rate_10,
-            "cover_rate_1": cover_rate_1,
-        }
+    
+    def create_Ci(self, A, B, i):
+        C = A.copy()
+        C[i] = B[i]
+        return C
+    
 
-    def sobol_analysis(self, variables: list, std_dev: int, num_samples: int):
+    def sobol_analysis(self, variables, std_dev, num_samples: int):
         """
         Sobol sensitivity analysis
         """
 
         # A = pd.read_excel("/home/raise/mcx_simulation/analysis_sensitivity/input_A.xlsx").iloc[:, 0:3].values.tolist()
-        A = self.set_variables(variables, std_dev, num_samples)
+        std_dev_pos = std_dev['pos'] * 3
+        std_dev_rot = std_dev['rot'] * 3
+        try:
+            A = self.set_variables(variables, std_dev, num_samples)
+            self.run_simulation(A, f"A_pos_{std_dev_pos}_rot_{std_dev_rot}")
+            send_email('A simulation', 'A simulation was successfully completed.')
+        except Exception as e:
+            send_email('Error', f'Error occurred in A simulation\n{e}')
+        
+        try:
+            B = self.set_variables(variables, std_dev, num_samples)
+            self.run_simulation(B, f"B_pos_{std_dev_pos}_rot_{std_dev_rot}")
+            send_email('B simulation', 'B simulation was successfully completed.')
+        except Exception as e:
+            send_email('Error', f'Error occurred in B simulation\n{e}')
+
         """
         samples = []
         for i in range(len(A)):
@@ -220,22 +228,20 @@ class SobolAnalysis(Runmcx):
         plt.show()
         
         """
-        ic.ic(A[0])
-        Y_A = self.run_simulation(A, f"A_{std_dev}")
 
-        V_Y = []
-        for i in range(9):
-            V_Y.append(np.var([row[i] for row in Y_A]))
-        ic.ic(V_Y)
-        V_Y = np.array(V_Y)
-        
-        sobol_first = np.zeros(9)
-        sobol_first_err = np.zeros(9)
-        ic.ic(sobol_first)
+        for changes in ['pos', 'rot', 'opt']:
+            std_dev_pos = std_dev['pos'] * 3
+            std_dev_rot = std_dev['rot'] * 3
+            try:
+                AB = self.create_Ci(A, B, changes)
+                self.run_simulation(AB, f"AB_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
+                send_email('AB simulation', f"AB simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")
 
-        for j in range(9):
-            Y_A_column = np.array([row[j] for row in Y_A])
-            sobol_first[j] = np.mean(Y_A_column) / V_Y[j]
-            sobol_first_err[j] = np.std(np.array(Y_A_column)) / V_Y[j]
-        return sobol_first, sobol_first_err
-    
+                BA = self.create_Ci(B, A, changes)
+                self.run_simulation(BA, f"BA_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
+                send_email('BA simulation', f"BA simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")
+            except Exception as e: 
+                send_email('Error', f'Error occurred in AB simulation\n{e}')
+            
+
+

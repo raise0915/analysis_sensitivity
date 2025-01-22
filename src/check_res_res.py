@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import icecream as ic
 
-file_path = "input_position_20241218_A_1.67.xlsx"  # 例: "output_data.xlsx"
+file_path = "/home/mbpl/morizane/analysis_sensitivity/input_optical_properties_1225_A_[0. 4. 0. 3.].xlsx"  # 例: "output_data.xlsx"
 df = pd.read_excel(file_path)
 
 # 位置変数の列名を指定
@@ -14,6 +14,7 @@ optical_cols = ["mua_normal", "mus_normal", "mua_tumour", "mus_tumour"]
 function_cols = [col for col in df.columns if col not in (position_cols + rotation_cols + optical_cols)]
 
 
+"""
 # 合成位置変数 (例: 原点からの距離)
 origin = np.array([247, 414, 382])
 X = np.sqrt(
@@ -22,6 +23,9 @@ X = np.sqrt(
     + (df[position_cols[2]] - origin[2]) ** 2
 )
 df['r'] = X
+"""
+
+
 
 # 条件付き期待値と一次感度指数を計算する関数
 def compute_sobol_index(df, input_var, output_var, num_bins=100):
@@ -49,6 +53,18 @@ def compute_sobol_index(df, input_var, output_var, num_bins=100):
     S1 = variance_conditional_mean / variance_total
     
     return S1
+
+
+# optical_colsの変数について一次感度指数を計算
+optical_results = {}
+for optical_var in optical_cols:
+    for func in function_cols:
+        S1 = compute_sobol_index(df, optical_var, func, num_bins=1000)
+        optical_results[(optical_var, func)] = S1
+
+# 結果を表示
+for optical_var, S1 in optical_results.items():
+    print(f"S1 (一次感度指数) for {optical_var}: {S1}")
 
 # 評価関数ごとに一次感度指数を計算
 results = {}

@@ -7,14 +7,16 @@ from numpy.random import default_rng
 
 # 1. データの読み込み
 # エクセルファイルのパスを指定
-file_path = "input_position_20241218_A_1.67.xlsx"  # 例: "output_data.xlsx"
+file_path = "/home/mbpl/morizane/analysis_sensitivity/input_optical_properties_1225_A_[0. 4. 0. 3.].xlsx"  # 例: "output_data.xlsx"
 df = pd.read_excel(file_path)
 
 # 位置変数の列名を指定
 position_cols = ["pos_x", "pos_y", "pos_z"]
 rotation_cols = ["rot_x", "rot_y", "rot_z"]
-function_cols = [col for col in df.columns if col not in (position_cols + rotation_cols)]
+optical_cols = ["mua_normal", "mus_normal", "mua_tumour", "mus_tumour"]
+function_cols = [col for col in df.columns if col not in (position_cols + rotation_cols + optical_cols)]
 
+"""
 # 合成位置変数 (例: 原点からの距離)
 origin = np.array([247, 414, 382])
 X = np.sqrt(
@@ -22,12 +24,16 @@ X = np.sqrt(
     + (df[position_cols[1]] - origin[1]) ** 2
     + (df[position_cols[2]] - origin[2]) ** 2
 )
+"""
+# optical_colsを変数としてSobol解析
+X = df[optical_cols].values
+
 
 # 感度指数を計算
 def first_order_sensitivity(X, Y):
     Y_mean = np.mean(Y)
     # Y_var = np.var(Y)
-    S = np.mean((X - np.mean(X)) * (Y - Y_mean), axis=0) / np.var(Y, axis=0)
+    S = np.mean((X - np.mean(X, axis=0)) * (Y.reshape(-1, 1) - Y_mean), axis=0) / np.var(Y, axis=0)
     return S
 
 

@@ -11,7 +11,7 @@ def create_rotated_cylinder_mask(dims, center, radius, length, direction):
 
 def plot_rotated_cylinder_for_slider(center, radius, length, direction):   
     x, y, z = [], [], []
-    for _ in range(10000):
+    for _ in range(100000):
         cc = calculate_position_and_direction(np.array(center), radius, length, direction)
         x.append(cc[0])
         y.append(cc[1])

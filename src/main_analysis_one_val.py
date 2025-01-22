@@ -3,6 +3,10 @@ from numpy.random import default_rng
 from analysis_sensitivity import SobolAnalysis
 import pandas as pd
 from run_mcx import Runmcx
+from send_mail import send_email
+
+from SALib.sample import saltelli
+from SALib.analyze import sobol
 
 
 
@@ -66,28 +70,37 @@ if __name__ == "__main__":
     # w = 0.05 # 30%/2
     # optical properties - 平均値から50%の範囲で
     for label in ['optical_properties', 'direction', 'position']:
-        if label == 'optical_properties':
-            sim = OptAnalysis(label)
-            sobol_first, sobol_first_err = sim.sobol_analysis(
-                    [mua_normal, mus_normal, mua_tumour, mus_tumour], 
-                    np.array([mua_normal, mus_normal, mua_tumour, mus_tumour])*0.5 // 3,
-                    num_samples
-                )
-            export_res_to_excel(sobol_first, sobol_first_err, label, '')
-        
-        if label == 'position':
-            for sigma in [5, 10]:
-                sim = SobolAnalysis(label)
+        try:
+            if label == 'optical_properties':
+                sim = OptAnalysis(label)
                 sobol_first, sobol_first_err = sim.sobol_analysis(
-                        [[pos_x, pos_y, pos_z]], round(sigma/3, 2), num_samples
+                        [mua_normal, mus_normal, mua_tumour, mus_tumour], 
+                        np.array([mua_normal, mus_normal, mua_tumour, mus_tumour])*0.5 // 3,
+                        num_samples
                     )
-                export_res_to_excel(sobol_first, sobol_first_err, label, sigma)
-        
-        if label =='direction':
-            for sigma in [5, 10]:
-                sim = DirAnalysis(label)
-                sobol_first, sobol_first_err = sim.sobol_analysis(
-                        [15, -10, 95], round(sigma/3, 2), num_samples
-                    )
-                export_res_to_excel(sobol_first, sobol_first_err, label, sigma)
-
+                export_res_to_excel(sobol_first, sobol_first_err, label, '')
+                send_email('Success', 'Optical properties analysis is done')
+            
+            if label == 'position':
+                for sigma in [5, 10]:
+                    sim = SobolAnalysis(label)
+                    sobol_first, sobol_first_err = sim.sobol_analysis(
+                            [[pos_x, pos_y, pos_z]], round(sigma/3, 2), num_samples
+                        )
+                    export_res_to_excel(sobol_first, sobol_first_err, label, sigma)
+                    send_email('Success', f'Position analysis val{sigma} is done')
+            
+            if label =='direction':
+                for sigma in [5, 10]:
+                    sim = DirAnalysis(label)
+                    sobol_first, sobol_first_err = sim.sobol_analysis(
+                            [15, -10, 95], round(sigma/3, 2), num_samples
+                        )
+                    export_res_to_excel(sobol_first, sobol_first_err, label, sigma)
+                    send_email('Success', f'Direction analysis val{sigma} is done')
+        except Exception as e:
+            send_email('Error', 
+                       f"""
+                       Error occurred in {label} analysis
+                       {e}
+                       """)

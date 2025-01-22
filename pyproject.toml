@@ -29,12 +29,13 @@ dependencies = [
     "icecream>=2.1.3",
     "scipy>=1.14.1",
     "seaborn>=0.13.2",
-    "vtk==9.3.0",
+    "vtk>=9.4.1",
     "pip>=24.3.1",
     "setuptools>=75.6.0",
     "opencv-contrib-python>=4.10.0.84",
     "opencv-python-headless>=4.10.0.84",
     "pyqt5>=5.15.11",
+    "mayavi>=4.8.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -55,3 +56,8 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcx_simulation"]
+
+[tool.ruff]
+target-version = "py311"
+
+line-length = 120
