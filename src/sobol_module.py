@@ -6,7 +6,11 @@ import icecream as ic
 
 num_samples = 1000
 
-root_path = "/home/mbpl/morizane/analysis_sensitivity/"
+root_path = "/home/mbpl/morizane/analysis_sensitivity/results"
+file_name = "pos_1.0_rot_5.0"
+calc_second_order = False
+
+
 # 位置変数の列名を指定
 position_cols = ["pos_x", "pos_y", "pos_z"]
 rotation_cols = ["rot_x", "rot_y", "rot_z"]
@@ -18,8 +22,8 @@ center = [248, 416, 384]
 initial_rotation = [15, -10, 95]
 
 # A, B, ABをエクセルから読み込み
-A_file_path = os.path.join(root_path, "input_A_pos_1_rot_15.xlsx")
-B_file_path = os.path.join(root_path, "input_B_pos_1_rot_15.xlsx")
+A_file_path = os.path.join(root_path, file_name, f"input_A_{file_name}.xlsx")
+B_file_path = os.path.join(root_path, file_name, f"input_B_{file_name}.xlsx")
 
 
 A = pd.read_excel(A_file_path)
@@ -52,25 +56,27 @@ sensitivity_indices = {
 def read_second_orders(func, name):
     num_samples = 1000
     ab = pd.DataFrame(np.zeros((num_samples, 3)))
-    ab.iloc[:, 0] = pd.read_excel(os.path.join(root_path, f"input_{name}_pos_1_rot_15_0108_pos.xlsx"))[func].values
-    ab.iloc[:, 1] = pd.read_excel(os.path.join(root_path, f"input_{name}_pos_1_rot_15_0108_rot.xlsx"))[func].values
-    ab.iloc[:, 2] = pd.read_excel(os.path.join(root_path, f"input_{name}_pos_1_rot_15_0108_opt.xlsx"))[func].values
+    ic.ic(len(pd.read_excel(os.path.join(root_path, file_name, f"input_{name}_{file_name}_pos.xlsx"))[func].values))
+    ab.iloc[:, 0] = pd.read_excel(os.path.join(root_path, file_name, f"input_{name}_{file_name}_pos.xlsx"))[func].values
+    ab.iloc[:, 1] = pd.read_excel(os.path.join(root_path, file_name, f"input_{name}_{file_name}_rot.xlsx"))[func].values
+    ab.iloc[:, 2] = pd.read_excel(os.path.join(root_path, file_name, f"input_{name}_{file_name}_opt.xlsx"))[func].values
     ab = ab.values
     
     return ab
 
 
 for func in evaluation_functions:
-    D = 1
+    D = 3
     # Define the problem for SALib
-    problem = {"num_vars": 1, "names": ["pos"]}
+    problem = {"num_vars": 3, "names": ["pos", "rot", "opt"], "bounds": [[0, 1]] * 3}
     a = A[func].values
     b = B[func].values
     ab = read_second_orders(func, "AB")
-    ba = read_second_orders(func, "BA")
+    if calc_second_order:
+            ba = read_second_orders(func, "BA")
     Y = np.zeros(num_samples * 3)
 
-    step =  2*D  + 2
+    step =  2*D  + 2 if calc_second_order else D+2
     N = len(a)
     Y = np.zeros(N * step)  # 元のYのサイズを予測（step * Nの長さ）
     Y[0 : Y.size : step] = a
@@ -78,19 +84,21 @@ for func in evaluation_functions:
 
     for j in range(D):
         Y[(j + 1) : Y.size : step] = ab[:, j]
-        Y[(j + 1 + D) : Y.size : step] = ba[:, j]
+        if calc_second_order:
+            Y[(j + 1 + D) : Y.size : step] = ba[:, j]
+    
 
     # Perform Sobol sensitivity analysis
     Si = sobol.analyze(problem, Y, calc_second_order=False)
-    ic.ic(Si)
 
     for i, name in enumerate(problem["names"]):
         sensitivity_indices[func]["first_order"][name] = Si["S1"][i]
         sensitivity_indices[func]["total_order"][name] = Si["ST"][i]
         sensitivity_indices[func]["first_conf"][name] = Si["S1_conf"][i]
         sensitivity_indices[func]["total_conf"][name] = Si["ST_conf"][i]
-        sensitivity_indices[func]["second_order"][name] = Si["S2"][i]
-        sensitivity_indices[func]["second_conf"][name] = Si["S2_conf"][i]
+        if calc_second_order:
+            sensitivity_indices[func]["second_order"][name] = Si["S2"][i]
+            sensitivity_indices[func]["second_conf"][name] = Si["S2_conf"][i]
 
 # sensitivity_indicesをDataFrameにまとめる
 sensitivity_df = pd.DataFrame(
@@ -105,4 +113,4 @@ sensitivity_df = pd.DataFrame(
 
 # DataFrameを表示
 print(sensitivity_df)
-sensitivity_df.to_excel(os.path.join(root_path, "sensitivity_indices_pos1_rot15_Salib.xlsx"))
+sensitivity_df.to_excel(os.path.join(root_path, f"sensitivity_indices_{file_name}_Salib.xlsx"))

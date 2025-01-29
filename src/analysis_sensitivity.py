@@ -207,6 +207,7 @@ class SobolAnalysis(Runmcx):
         std_dev_pos = std_dev['pos'] * 3
         std_dev_rot = std_dev['rot'] * 3
         try:
+            send_email('A simulation', 'A simulation has started.')
             A = self.set_variables(variables, std_dev, num_samples)
             self.run_simulation(A, f"A_pos_{std_dev_pos}_rot_{std_dev_rot}")
             send_email('A simulation', 'A simulation was successfully completed.')
@@ -214,6 +215,7 @@ class SobolAnalysis(Runmcx):
             send_email('Error', f'Error occurred in A simulation\n{e}')
         
         try:
+            send_email('B simulation', 'B simulation has started.')
             B = self.set_variables(variables, std_dev, num_samples)
             self.run_simulation(B, f"B_pos_{std_dev_pos}_rot_{std_dev_rot}")
             send_email('B simulation', 'B simulation was successfully completed.')
@@ -230,13 +232,13 @@ class SobolAnalysis(Runmcx):
         """
 
         for changes in ['pos', 'rot', 'opt']:
-            std_dev_pos = std_dev['pos'] * 3
-            std_dev_rot = std_dev['rot'] * 3
             try:
+                send_email('AB simulation', 'AB simulation has started.')   
                 AB = self.create_Ci(A, B, changes)
                 self.run_simulation(AB, f"AB_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
                 send_email('AB simulation', f"AB simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")
 
+                send_email('BA simulation', 'BA simulation has started.')   
                 BA = self.create_Ci(B, A, changes)
                 self.run_simulation(BA, f"BA_pos_{std_dev_pos}_rot_{std_dev_rot}_{today}_{changes}")
                 send_email('BA simulation', f"BA simulation {std_dev_pos}_rot_{std_dev_rot}_{today}_{changes} was successfully completed.")

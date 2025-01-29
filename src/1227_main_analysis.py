@@ -128,9 +128,9 @@ if __name__ == "__main__":
     # 3sigma = 5 mm
     # w = 0.05 # 30%/2
     # optical properties - 平均値から50%の範囲で
-    for sigma_pos in [1]:
+    for sigma_pos in [6, 8, 10, 7, 9]:
         # sigma_pos = 1 sigma_rot = 15 のoptはまだ - 0122
-        for sigma_rot in [15]:
+        for sigma_rot in [5, 10, 15]:
             std_dev['pos']  = sigma_pos /3
             std_dev['rot'] = sigma_rot /3
             sim = SobolAnalysis_1227()
