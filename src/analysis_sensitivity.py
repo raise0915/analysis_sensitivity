@@ -7,9 +7,10 @@ from cylinder import create_rotated_cylinder_mask
 import icecream as ic
 from numpy.random import default_rng
 from send_mail import send_email
+import traceback
 
 global today
-today ='0108'
+today ='0217'
 
 
 class SobolAnalysis(Runmcx):        
@@ -104,10 +105,10 @@ class SobolAnalysis(Runmcx):
             )
             
             if i == 0:
-                df.to_excel(f"{self.input_name}_{today}_{label}.xlsx", index=False, header=True)
+                df.to_excel(f"{self.input_name}_{label}.xlsx", index=False, header=True)
             else:
                 with pd.ExcelWriter(
-                    f"{self.input_name}_{today}_{label}.xlsx",
+                    f"{self.input_name}_{label}.xlsx",
                     mode="a",
                     engine="openpyxl",
                     if_sheet_exists="overlay",
@@ -125,11 +126,13 @@ class SobolAnalysis(Runmcx):
     def create_model(self, cylinder_pos, cylinder_rot):
         with open(self.model_path, "rb") as f:
             self.model = np.fromfile(f, dtype=np.uint8).reshape(
-                (600, 600, 600), order="F"
+                (200, 200, 200), order="F"
             )
+        print('aa')
         cylinder_mask = create_rotated_cylinder_mask(
-            [600, 600, 600], cylinder_pos, self.radius, self.length, cylinder_rot
+            [200, 200, 200], cylinder_pos, self.radius, self.length, cylinder_rot
         )
+        
         self.model[cylinder_mask == 1] = 4
 
     def evaluate_model(self):
@@ -137,7 +140,7 @@ class SobolAnalysis(Runmcx):
         Evaluates the model based on the simulation results.
         """
         with open(f"{self.OUTPUT_PATH}.mc2", "rb") as f:
-            res = np.fromfile(f, dtype=np.float32).reshape((600, 600, 600), order="F")
+            res = np.fromfile(f, dtype=np.float32).reshape((200, 200, 200), order="F")
             energy = 150 * (10**-3) * 667 * 100
             res *= energy
 
@@ -212,7 +215,8 @@ class SobolAnalysis(Runmcx):
             self.run_simulation(A, f"A_pos_{std_dev_pos}_rot_{std_dev_rot}")
             send_email('A simulation', 'A simulation was successfully completed.')
         except Exception as e:
-            send_email('Error', f'Error occurred in A simulation\n{e}')
+            tb = traceback.format_exc()
+            send_email('Error', f'Error occurred in A simulation\n{e}\nTraceback:\n{tb}')
         
         try:
             send_email('B simulation', 'B simulation has started.')

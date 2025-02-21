@@ -1,0 +1,68 @@
+{
+    "Session": {
+      "ID": "/home/mbpl/morizane/analysis_sensitivity/test_res",
+      "Photons": 1e7,
+      "OutputFormat": "mc2",
+      "OutputType": "F",
+      "RNGSeed": 1648335518       
+    },
+    "Forward": {
+      "T0": 0,
+      "T1": 5e-9,
+      "Dt": 5e-9
+    },
+    "Optode": {
+      "Source": {
+        "Type": "gaussian",
+        "Pos": [247, 414, 382],
+        "Dir": [
+          0,
+          0,
+          -1
+        ],
+        "Param1": [1, -15, 10, 95],
+        "Param2": [
+          22,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "Domain": {
+      "VolumeFile": "/home/mbpl/morizane/analysis_sensitivity/089_tumour_model_cut.bin",
+      "LengthUnit": 0.5,
+      "OriginType": true,
+      "Dim": [
+        200,
+        200,
+        200
+      ],
+      "Media": [
+        {
+            "mua": 0.37,
+            "mus": 27,
+            "g": 0.9,
+            "n": 1.38
+          },
+        {
+            "mua": 0.37,
+            "mus": 27,
+            "g": 0.9,
+            "n": 1.38
+          },
+          {
+            "mua": 1e-5,
+            "mus": 0.1,
+            "g": 1.0,
+            "n": 1.0
+          },
+        {
+            "mua": 0.27,
+            "mus": 20,
+            "g": 0.9,
+            "n": 1.38
+          }
+      ]
+    }
+}

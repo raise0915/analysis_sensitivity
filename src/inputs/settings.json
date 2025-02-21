@@ -5,6 +5,7 @@
     "INPUT_PATH": "/home/mbpl/morizane/analysis_sensitivity/input",
     "raidus": 1,
     "length" : 22,
-    "input_name": "test"
-
+    "input_name": "test",
+    "position": [148, 187, 109],
+    "rotation": [21, -20 , 102]
 }

@@ -7,7 +7,7 @@ import icecream as ic
 num_samples = 1000
 
 root_path = "/home/mbpl/morizane/analysis_sensitivity/results"
-file_name = "pos_1.0_rot_5.0"
+file_name = "pos_10.0_rot_10.0"
 calc_second_order = False
 
 

@@ -13,10 +13,12 @@ class Runmcx():
         self.radius = settings.get('raidus')
         self.length = settings.get('length')
         self.input_name = settings.get('INPUT_PATH')
-        self.cfg = json.load(open("/home/mbpl/morizane/analysis_sensitivity/src/inputs/input.json"))
+        self.cfg = json.load(open("/home/mbpl/morizane/analysis_sensitivity/src/inputs/input_cut.json"))
         self.HOME_PATH = settings.get('HOME_PATH')
         self.OUTPUT_PATH = settings.get('OUTPUT_PATH')
         self.model_path = self.cfg['Domain']['VolumeFile']
+        self.position = settings.get('position')
+        self.rotation = settings.get('rotation')
    
     def set_conditions(self, params): # , rotation, opt_tumour, opt_normal):
         output_path = os.path.join(self.MCX_PATH, "test.json")

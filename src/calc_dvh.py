@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 def calc_dvh(res, model):
     bin_w = 0.001
     
-    size = np.arange(600*600*600, dtype=np.float32).reshape(600, 600, 600)
+    size = np.arange(200*200*200, dtype=np.float32).reshape(200, 200, 200)
     tumour_mask = np.full_like(size, True)
     tumour_mask[model == 3] = False
 
@@ -22,13 +22,13 @@ def calc_dvh(res, model):
     hist_total_t = np.zeros(num_of_bins)
     hist_total_b = np.zeros(num_of_bins)
     
-    for plane in range(600):
+    for plane in range(200):
         hist, edge  = np.histogram(
             tumour[:, :, plane].compressed(), bins=num_of_bins, range=(0, num_of_bins*bin_w)
         )
         hist_total_t += hist
 
-    for plane in range(600):
+    for plane in range(200):
         hist, edge_b  = np.histogram(
             bronchi[:, :, plane].compressed(), bins=num_of_bins, range=(0, num_of_bins*bin_w)
         )
@@ -64,7 +64,7 @@ def calc_log_dvh_with_log(res, model):
     bin_min = 1e-7
     num_of_bins = int(np.log10(bin_max) - np.log10(bin_min)) * 10  # bin_minからbin_maxまで10の累乗ごとのbinを作成
 
-    size = np.zeros((600, 600, 600), dtype=np.float32)
+    size = np.zeros((200, 200, 200), dtype=np.float32)
     tumour_mask = np.full_like(size, True, dtype=bool)
     tumour_mask[model == 3] = False
 
@@ -85,19 +85,19 @@ def calc_log_dvh_with_log(res, model):
 
     bin_edges = np.logspace(np.log10(bin_min), np.log10(bin_max), num_of_bins + 1)
 
-    for plane in range(600):
+    for plane in range(200):
         hist, _  = np.histogram(
             tumour[:, :, plane].compressed(), bins=bin_edges
         )
         hist_total_t += hist
 
-    for plane in range(600):
+    for plane in range(200):
         hist, _  = np.histogram(
             bronchi[:, :, plane].compressed(), bins=bin_edges
         )
         hist_total_b += hist
 
-    for plane in range(600):
+    for plane in range(200):
         hist, _  = np.histogram(
             lung_tissue[:, :, plane].compressed(), bins=bin_edges
         )

@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 from numpy.random import default_rng
+import json
 
 from analysis_sensitivity import SobolAnalysis
 from send_mail import send_email
+from rotate_fiber import rotate_fiber
 
-global today
-today = ''
 
 class SobolAnalysis_1227(SobolAnalysis):
     def set_variables(self, variables:dict, std_dev:dict, num_samples):
@@ -15,24 +15,11 @@ class SobolAnalysis_1227(SobolAnalysis):
         covariance_matrix = np.diag(
             [std_dev['pos']**2, std_dev['pos']**2, std_dev['pos']**2]
         )  # 共分散行列（対角行列）
-        variables_pos = np.concatenate(variables['pos'])
-        rng = default_rng()
+        variables_pos = variables['pos']
+        rng = default_rng() 
         samples_pos = rng.multivariate_normal(variables_pos, covariance_matrix, num_samples)
 
-        rng = default_rng()
-        def cartesian_to_spherical(x, y, z):
-            r = np.sqrt(x**2 + y**2 + z**2)
-            mtheta = np.arccos(z / r)
-            phi = np.arctan2(y, x)
-            return r, phi, mtheta
-
-        r, _phi, _ = cartesian_to_spherical(float(variables['rot'][0]), float(variables['rot'][1]), float(variables['rot'][2]))
-        theta = rng.normal(loc=_phi, scale=np.radians(std_dev['rot']), size=num_samples) 
-        phi = rng.uniform(0, 2 * np.pi, num_samples)
-        x = r * np.sin(phi) * np.cos(theta)
-        y = r * np.sin(phi) * np.sin(theta)
-        z = r * np.cos(phi)
-        samples_rot = np.array([x, y, z]).T
+        samples_rot = rotate_fiber(variables_pos, self.length, variables['pos'], std_dev['rot'], num_samples)
 
 
         variables_opt = np.array(variables['opt'])
@@ -85,10 +72,10 @@ class SobolAnalysis_1227(SobolAnalysis):
                 df = pd.DataFrame(res_dict, index=[0])
 
                 if i == 0:
-                    df.to_excel(f"{self.input_name}_{today}_{label}.xlsx", index=False, header=True)
+                    df.to_excel(f"{self.input_name}_{label}.xlsx", index=False, header=True)
                 else:
                     with pd.ExcelWriter(
-                        f"{self.input_name}_{today}_{label}.xlsx",
+                        f"{self.input_name}_{label}.xlsx",
                         mode="a",
                         engine="openpyxl",
                         if_sheet_exists="overlay",
@@ -100,14 +87,15 @@ class SobolAnalysis_1227(SobolAnalysis):
                             header=False,
                             startrow=i + 1,
                         )
+                    
 
 if __name__ == "__main__":
+    with open('/home/mbpl/morizane/analysis_sensitivity/src/inputs/default_value.json') as f:
+        default_value = json.load(f)
+    print(default_value)
+
     # setting params
     num_samples = 1000 # サンプル数
-    pos_x = 248
-    pos_y = 416
-    pos_z = 384
-
     mua_normal = 0.37
     mua_tumour = 0.27
     mus_normal = 27
@@ -115,8 +103,8 @@ if __name__ == "__main__":
     opt_std_devs = np.array([0.14, 10, 0.05, 4.6])
 
     variables = {
-        'pos': [[pos_x, pos_y, pos_z]],
-        'rot': [15, -10, 95],
+        'pos': np.array(default_value['pos_cut']),
+        'rot': default_value['rot_cut'],
         'opt': [mua_normal, mus_normal, mua_tumour, mus_tumour]
     }
 
@@ -128,12 +116,13 @@ if __name__ == "__main__":
     # 3sigma = 5 mm
     # w = 0.05 # 30%/2
     # optical properties - 平均値から50%の範囲で
-    for sigma_pos in [6, 8, 10, 7, 9]:
+    for sigma_pos in [2, 4, 6, 8]:
         # sigma_pos = 1 sigma_rot = 15 のoptはまだ - 0122
-        for sigma_rot in [5, 10, 15]:
+        for sigma_rot in [2, 4, 6]:
             std_dev['pos']  = sigma_pos /3
             std_dev['rot'] = sigma_rot /3
             sim = SobolAnalysis_1227()
             sim.sobol_analysis(variables, std_dev, num_samples)
             send_email('Success', f'Position analysis sigma_pos:{sigma_pos} sigma_rot:{sigma_rot} is done')
     send_email('Success', 'All analysis is done')
+

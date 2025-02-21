@@ -34,7 +34,7 @@ dependencies = [
     "opencv-contrib-python>=4.10.0.84",
     "opencv-python-headless>=4.10.0.84",
     "pyqt5>=5.15.11",
-    "mayavi==4.7.2",
+    "mayavi @ /home/mbpl/enthought-mayavi-4.8.2-61-g49e6c8c.zip",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
