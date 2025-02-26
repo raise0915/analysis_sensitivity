@@ -17,8 +17,9 @@ class Runmcx():
         self.HOME_PATH = settings.get('HOME_PATH')
         self.OUTPUT_PATH = settings.get('OUTPUT_PATH')
         self.model_path = self.cfg['Domain']['VolumeFile']
-        self.position = settings.get('position')
-        self.rotation = settings.get('rotation')
+        self.result_save_path = settings.get('RESULT_SAVE_PATH')
+        self.today = settings.get('today')
+        self.save_path = os.path.join(self.result_save_path,self.today)
    
     def set_conditions(self, params): # , rotation, opt_tumour, opt_normal):
         output_path = os.path.join(self.MCX_PATH, "test.json")

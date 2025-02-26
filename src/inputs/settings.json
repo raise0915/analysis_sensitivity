@@ -3,9 +3,9 @@
     "HOME_PATH": "/home/mbpl",
     "OUTPUT_PATH": "/home/mbpl/morizane/analysis_sensitivity/test_res",
     "INPUT_PATH": "/home/mbpl/morizane/analysis_sensitivity/input",
+    "RESULT_SAVE_PATH": "/home/mbpl/morizane/analysis_sensitivity/results",
+    "today": "0226",
     "raidus": 1,
     "length" : 22,
-    "input_name": "test",
-    "position": [148, 187, 109],
-    "rotation": [21, -20 , 102]
+    "input_name": "test"
 }

@@ -30,13 +30,13 @@
       }
     },
     "Domain": {
-      "VolumeFile": "/home/mbpl/morizane/analysis_sensitivity/089_tumour_model_cut.bin",
+      "VolumeFile": "/home/mbpl/morizane/analysis_sensitivity/models/089_tumour_model_cut_re.bin",
       "LengthUnit": 0.5,
       "OriginType": true,
       "Dim": [
-        200,
-        200,
-        200
+        100,
+        100,
+        100
       ],
       "Media": [
         {
